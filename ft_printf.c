@@ -58,9 +58,11 @@ int ft_strlen(char *s)
     return i;
 }
 
-int ft_nbrlen(int nb)
+int ft_nbrlen(long nb, t_printf *env)
 {
     int i = 0;
+    if (nb == 0 && env->precision != 0)
+        return 1;
     if (nb < 0)
     {
         nb *= -1;
@@ -89,7 +91,7 @@ void ft_write_s(char *arg, t_printf *env)
     {
         env->width -= size;
         while (env->width-- > 0)
-            ft_putchar('x', env);
+            ft_putchar(32, env);
     }
     if (size != ft_strlen(arg))
         ft_putstr_size(arg, size, env);
@@ -100,17 +102,18 @@ void ft_write_s(char *arg, t_printf *env)
 void ft_write_d(long arg, t_printf *env)
 {
     int size = 0;
-    int sizearg = ft_nbrlen(arg);
-    if(env->precision > sizearg)
+    int sizearg = ft_nbrlen(arg, env);
+    if (env->precision > sizearg)
         size = env->precision;
     else
         size = sizearg;
     if (env->width > 0 && env->width > size)
     {
+        env->width -= size;
         while(env->width-- > 0)
-            ft_putchar('x', env);
+            ft_putchar(32, env);
     }
-    if(arg < 0 )
+    if(arg < 0)
     {
         ft_putchar('-', env);
         arg *= -1;
@@ -121,7 +124,7 @@ void ft_write_d(long arg, t_printf *env)
     int i = 11;
     int tmp = 0;
     buffer[i--] = '\0';
-    if (arg == 0)
+    if (arg == 0 && env->precision != 0)
         buffer[i--] = '0';
     while (arg)  
     {
@@ -138,7 +141,7 @@ void ft_write_x(unsigned int arg, t_printf *env)
     int i = 11;
     int tmp = 0;
     buffer[i--] = '\0';
-    if (arg == 0)
+    if (arg == 0 && env->precision != 0)
         buffer[i--] = '0';
     while (arg)  
     {
@@ -156,9 +159,10 @@ void ft_write_x(unsigned int arg, t_printf *env)
     else
         size = sizearg;
     if (env->width > 0 && env->width > size)
-    {
+    {   
+        env->width -= size;
         while(env->width-- > 0)
-            ft_putchar('x', env);
+            ft_putchar(32, env);
     }
     while (size-- > sizearg)
         ft_putchar('0', env);
@@ -216,7 +220,7 @@ int ft_printf (const char *format, ...)
     va_end(env.args);
     return(env.nbtotal);
 }
-
+/*
 int main(void)
 {
     int a = 0;
@@ -392,16 +396,231 @@ int main(void)
 	b = printf("%s\n",val6);
 	printf("%d %d \n", a ,b);
 }
-
-/* 
-%s if env->precision > -1 && env->precision < ft_strlen(arg)
-    ft_putstr_size (arg,env->precision, env);
-    else 
-        ft_putstr(arg, env);
-%d && %x if env->precision > nbrlen(arg);
-
-
-
-
-
 */
+int
+	main(void)
+{
+	int	r;
+    int v;
+
+    v = 0;
+	r = 0;
+    r = ft_printf("Simple test\n");
+    v = printf("Simple test\n");
+    printf("%d %d \n", r ,v);
+	r = ft_printf("");
+    v = printf("");
+    printf("%d %d \n", r ,v);
+    ft_printf("--Format---");
+	r = ft_printf("\n");
+    v = printf("\n");
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", 0);
+    v = printf("%d\n", 0);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", 42);
+    v = printf("%d\n", 42);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", 1);
+    v = printf("%d\n", 1);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", 5454);
+    v = printf("%d\n", 5454);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", (int)2147483647);
+    v = printf("%d\n", (int)2147483647);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", (int)2147483648);
+    v = printf("%d\n", (int)2147483648);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", (int)-2147483648);
+    v = printf("%d\n", (int)-2147483648);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%d\n", (int)-2147483649);
+    v = printf("%d\n", (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	ft_printf("\n");
+	r = ft_printf("%x\n", 0);
+    v = printf("%x\n", 0);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", 42);
+    v = printf("%x\n", 42);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", 1);
+    v = printf("%x\n", 1);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", 5454);
+    v = printf("%x\n", 5454);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", (int)2147483647);
+    v = printf("%x\n", (int)2147483647);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", (int)2147483648);
+    v = printf("%x\n", (int)2147483648);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", (int)-2147483648);
+    v = printf("%x\n", (int)-2147483648);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%x\n", (int)-2147483649);
+    v = printf("%x\n", (int)-2147483649);
+    printf("%d %d \n", r ,v);
+    printf("\n");
+	r = ft_printf("%s\n", "");
+    v = printf("%s\n", "");
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%s\n", "toto");
+    v = printf("%s\n", "toto");
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%s\n", "wiurwuyrhwrywuier");
+    v = printf("%s\n", "wiurwuyrhwrywuier");
+    printf("%d %d \n", r ,v);
+	r = ft_printf("%s\n", NULL);
+    v = printf("%s\n", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+    v = printf("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+    printf("%d %d \n", r ,v);
+	ft_printf("\n--Mixed---\n");
+	r = ft_printf("%d%x%d%x%d%x%d%x\n", 0, 0, 42, 42, 2147483647, 2147483647, (int)-2147483648, (int)-2147483648);
+    v = printf("%d%x%d%x%d%x%d%x\n", 0, 0, 42, 42, 2147483647, 2147483647, (int)-2147483648, (int)-2147483648);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("-%d-%x-%d-%x-%d-%x-%d-%x-\n", 0, 0, 42, 42, 2147483647, 2147483647, (int)-2147483648, (int)-2147483648);
+    v = printf("-%d-%x-%d-%x-%d-%x-%d-%x-\n", 0, 0, 42, 42, 2147483647, 2147483647, (int)-2147483648, (int)-2147483648);
+    printf("%d %d \n", r ,v);
+	ft_printf("\n");
+	r = ft_printf("%s%s%s%s\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+    v = printf("%s%s%s%s\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+    v = printf("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+    printf("%d %d \n", r ,v);
+	ft_printf("--1 Flag--\n");
+	r = ft_printf("d0w %0d %0d %0d %0d %0d %0d %0d %0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d0w %0d %0d %0d %0d %0d %0d %0d %0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d4w %4d %4d %4d %4d %4d %4d %4d %4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d4w %4d %4d %4d %4d %4d %4d %4d %4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d10w %10d %10d %10d %10d %10d %10d %10d %10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d10w %10d %10d %10d %10d %10d %10d %10d %10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d0p %.0d %.0d %.0d %.0d %.0d %.0d %.0d %.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d0p %.0d %.0d %.0d %.0d %.0d %.0d %.0d %.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d4p %.4d %.4d %.4d %.4d %.4d %.4d %.4d %.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d4p %.4d %.4d %.4d %.4d %.4d %.4d %.4d %.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d10p %.10d %.10d %.10d %.10d %.10d %.10d %.10d %.10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d10p %.10d %.10d %.10d %.10d %.10d %.10d %.10d %.10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x0w %0x %0x %0x %0x %0x %0x %0x %0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x0w %0x %0x %0x %0x %0x %0x %0x %0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x4w %4x %4x %4x %4x %4x %4x %4x %4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x4w %4x %4x %4x %4x %4x %4x %4x %4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x10w %10x %10x %10x %10x %10x %10x %10x %10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x10w %10x %10x %10x %10x %10x %10x %10x %10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x0p %.0x %.0x %.0x %.0x %.0x %.0x %.0x %.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x0p %.0x %.0x %.0x %.0x %.0x %.0x %.0x %.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x4p %.4x %.4x %.4x %.4x %.4x %.4x %.4x %.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x4p %.4x %.4x %.4x %.4x %.4x %.4x %.4x %.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x10p %.10x %.10x %.10x %.10x %.10x %.10x %.10x %.10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x10p %.10x %.10x %.10x %.10x %.10x %.10x %.10x %.10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s0p ~%.0s` ~%.0s` ~%.0s` ~%.0s` ~%.0s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s0p ~%.0s` ~%.0s` ~%.0s` ~%.0s` ~%.0s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s4w ~%4s` ~%4s` ~%4s` ~%4s` ~%4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s4w ~%4s` ~%4s` ~%4s` ~%4s` ~%4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s4p ~%.4s` ~%.4s` ~%.4s` ~%.4s` ~%.4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s4p ~%.4s` ~%.4s` ~%.4s` ~%.4s` ~%.4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s10w ~%10s` ~%10s` ~%10s` ~%10s` ~%10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s10w ~%10s` ~%10s` ~%10s` ~%10s` ~%10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s10p ~%.10s` ~%.10s` ~%.10s` ~%.10s` ~%.10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s10p ~%.10s` ~%.10s` ~%.10s` ~%.10s` ~%.10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	ft_printf("--2 Flags--\n");
+	r = ft_printf("d0w0p %0.0d %0.0d %0.0d %0.0d %0.0d %0.0d %0.0d %0.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d0w0p %0.0d %0.0d %0.0d %0.0d %0.0d %0.0d %0.0d %0.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x0w0p %0.0x %0.0x %0.0x %0.0x %0.0x %0.0x %0.0x %0.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x0w0p %0.0x %0.0x %0.0x %0.0x %0.0x %0.0x %0.0x %0.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	ft_printf("--Precision--\n");
+	r = ft_printf("d0w4p %0.4d %0.4d %0.4d %0.4d %0.4d %0.4d %0.4d %0.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d0w4p %0.4d %0.4d %0.4d %0.4d %0.4d %0.4d %0.4d %0.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d0w10p %0.10d %0.10d %0.10d %0.10d %0.10d %0.10d %0.10d %0.10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d0w10p %0.10d %0.10d %0.10d %0.10d %0.10d %0.10d %0.10d %0.10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x0w4p %0.4x %0.4x %0.4x %0.4x %0.4x %0.4x %0.4x %0.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x0w4p %0.4x %0.4x %0.4x %0.4x %0.4x %0.4x %0.4x %0.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x0w10p %0.10x %0.10x %0.10x %0.10x %0.10x %0.10x %0.10x %0.10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x0w10p %0.10x %0.10x %0.10x %0.10x %0.10x %0.10x %0.10x %0.10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	ft_printf("--Width--\n");
+	r = ft_printf("d4w0p %4.0d %4.0d %4.0d %4.0d %4.0d %4.0d %4.0d %4.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d4w0p %4.0d %4.0d %4.0d %4.0d %4.0d %4.0d %4.0d %4.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d10w0p %10.0d %10.0d %10.0d %10.0d %10.0d %10.0d %10.0d %10.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d10w0p %10.0d %10.0d %10.0d %10.0d %10.0d %10.0d %10.0d %10.0d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x4w0p %4.0x %4.0x %4.0x %4.0x %4.0x %4.0x %4.0x %4.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x4w0p %4.0x %4.0x %4.0x %4.0x %4.0x %4.0x %4.0x %4.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x10w0p %10.0x %10.0x %10.0x %10.0x %10.0x %10.0x %10.0x %10.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x10w0p %10.0x %10.0x %10.0x %10.0x %10.0x %10.0x %10.0x %10.0x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s4w0p ~%4.s` ~%4.s` ~%4.s` ~%4.s` ~%4.s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s4w0p ~%4.s` ~%4.s` ~%4.s` ~%4.s` ~%4.s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s10w0p ~%10.0s` ~%10.0s` ~%10.0s` ~%10.0s` ~%10.0s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s10w0p ~%10.0s` ~%10.0s` ~%10.0s` ~%10.0s` ~%10.0s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	ft_printf("--Width and Precision--\n");
+	r = ft_printf("d10w4p %10.4d %10.4d %10.4d %10.4d %10.4d %10.4d %10.4d %10.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d10w4p %10.4d %10.4d %10.4d %10.4d %10.4d %10.4d %10.4d %10.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d10w10p %10.10d %10.10d %10.10d %10.10d %10.10d %10.10d %10.10d %10.10d\n", 0, 1, 42, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d10w10p %10.10d %10.10d %10.10d %10.10d %10.10d %10.10d %10.10d %10.10d\n", 0, 1, 42, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d4w4p %4.4d %4.4d %4.4d %4.4d %4.4d %4.4d %4.4d %4.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d4w4p %4.4d %4.4d %4.4d %4.4d %4.4d %4.4d %4.4d %4.4d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("d4w10p %4.10d %4.10d %4.10d %4.10d %4.10d %4.10d %4.10d %4.10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("d4w10p %4.10d %4.10d %4.10d %4.10d %4.10d %4.10d %4.10d %4.10d\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x10w4p %10.4x %10.4x %10.4x %10.4x %10.4x %10.4x %10.4x %10.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x10w4p %10.4x %10.4x %10.4x %10.4x %10.4x %10.4x %10.4x %10.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x10w10p %10.10x %10.10x %10.10x %10.10x %10.10x %10.10x %10.10x %10.10x\n", 0, 1, 42, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x10w10p %10.10x %10.10x %10.10x %10.10x %10.10x %10.10x %10.10x %10.10x\n", 0, 1, 42, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x4w4p %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x4w4p %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("x4w10p %4.10x %4.10x %4.10x %4.10x %4.10x %4.10x %4.10x %4.10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    v = printf("x4w10p %4.10x %4.10x %4.10x %4.10x %4.10x %4.10x %4.10x %4.10x\n", 0, 42, 1, 4554, 2147483647, (int)2147483648, (int)-2147483648, (int)-2147483649);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s10w4p ~%10.4s` ~%10.4s` ~%10.4s` ~%10.4s` ~%10.4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s10w4p ~%10.4s` ~%10.4s` ~%10.4s` ~%10.4s` ~%10.4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s10w10p ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s10w10p ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s4w4p ~%4.4s` ~%4.4s` ~%4.4s` ~%4.4s` ~%4.4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s4w4p ~%4.4s` ~%4.4s` ~%4.4s` ~%4.4s` ~%4.4s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	r = ft_printf("s4w10p ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    v = printf("s4w10p ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s` ~%10.10s`\n", "", "toto", "0123456789", "tjehurthteutuiehteute", NULL);
+    printf("%d %d \n", r ,v);
+	printf("written: %d\n", r);
+}
